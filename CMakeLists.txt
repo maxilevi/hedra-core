@@ -44,7 +44,7 @@ target_compile_options(meshoptimizer_obj PRIVATE /W4 /WX)
 add_library(hedracore SHARED $<TARGET_OBJECTS:noise_obj> $<TARGET_OBJECTS:meshoptimizer_obj> src/hedra.h src/hedra.cpp)
 target_include_directories(hedracore INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
-set_target_properties(hedracore PROPERTIES OUTPUT_NAME "Core")
+set_target_properties(hedracore PROPERTIES OUTPUT_NAME "hedracore")
 
 if(MSVC)
 	target_compile_options(hedracore PRIVATE /W4 /WX)
