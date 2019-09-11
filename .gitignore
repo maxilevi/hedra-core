@@ -31,5 +31,6 @@
 *.out
 *.app
 
-cmake-build-debug
-cmake-build-release
+cmake-build-debug/
+cmake-build-release/
+cmake-build-release-x86/
