@@ -47,7 +47,7 @@ target_include_directories(hedracore INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/src"
 set_target_properties(hedracore PROPERTIES OUTPUT_NAME "hedracore")
 
 if(MSVC)
-	target_compile_options(hedracore PRIVATE /W4 /WX)
+	target_compile_options(hedracore PRIVATE)
 else()
 	target_compile_options(hedracore PRIVATE -Wall -Wextra -Werror)
 endif()

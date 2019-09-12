@@ -33,4 +33,4 @@
 
 cmake-build-debug/
 cmake-build-release/
-cmake-build-release-x86/
+cmake-build-relwithdebinfo/
