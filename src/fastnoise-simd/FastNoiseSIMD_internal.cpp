@@ -1334,6 +1334,81 @@ void SIMD_LEVEL_CLASS::Fill##func##Set(float* noiseSet, int xStart, int yStart, 
 	SIMD_ZERO_ALL();\
 }
 
+#define INIT_OFFSET_VARIABLES()\
+	SIMDf xFreqV = SIMDf_SET(m_frequency * m_xScale);\
+	SIMDf yFreqV = SIMDf_SET(m_frequency * m_yScale);\
+	SIMDf zFreqV = SIMDf_SET(m_frequency * m_zScale);\
+	SIMDf xOffsetV = SIMDf_SET(xOffset * m_frequency);\
+	SIMDf yOffsetV = SIMDf_SET(yOffset * m_frequency);\
+	SIMDf zOffsetV = SIMDf_SET(zOffset * m_frequency);\
+	int xStart = 0;\
+	int yStart = 0;\
+	int zStart = 0;\
+
+#define FILL_SET_WITH_OFFSET(func) \
+void SIMD_LEVEL_CLASS::Fill##func##SetWithOffset(float* noiseSet, float xOffset, float yOffset, float zOffset, int xSize, int ySize, int zSize)\
+{\
+	assert(noiseSet);\
+	SIMD_ZERO_ALL();\
+	SIMDi seedV = SIMDi_SET(m_seed);\
+	\
+	INIT_PERTURB_VALUES();\
+	INIT_OFFSET_VARIABLES();\
+	\
+	SET_BUILDER(\
+		xF = SIMDf_ADD(xF, xOffsetV);\
+		yF = SIMDf_ADD(yF, yOffsetV);\
+		zF = SIMDf_ADD(zF, zOffsetV);\
+		result = FUNC(func##Single)(seedV, xF, yF, zF)\
+	)\
+	\
+	SIMD_ZERO_ALL();\
+}
+
+#define FILL_FRACTAL_SET_WITH_OFFSET(func) \
+void SIMD_LEVEL_CLASS::Fill##func##FractalSetWithOffset(float* noiseSet, float xOffset, float yOffset, float zOffset, int xSize, int ySize, int zSize)\
+{\
+	assert(noiseSet);\
+	SIMD_ZERO_ALL();\
+	\
+	SIMDi seedV = SIMDi_SET(m_seed);\
+	SIMDf lacunarityV = SIMDf_SET(m_lacunarity);\
+	SIMDf gainV = SIMDf_SET(m_gain);\
+	SIMDf fractalBoundingV = SIMDf_SET(m_fractalBounding);\
+	\
+	INIT_PERTURB_VALUES();\
+	INIT_OFFSET_VARIABLES();\
+	\
+	switch(m_fractalType)\
+	{\
+	case FBM:\
+		SET_BUILDER(\
+			xF = SIMDf_ADD(xF, xOffsetV);\
+			yF = SIMDf_ADD(yF, yOffsetV);\
+			zF = SIMDf_ADD(zF, zOffsetV);\
+			FBM_SINGLE(func)\
+		)\
+		break;\
+	case Billow:\
+		SET_BUILDER(\
+			xF = SIMDf_ADD(xF, xOffsetV);\
+			yF = SIMDf_ADD(yF, yOffsetV);\
+			zF = SIMDf_ADD(zF, zOffsetV);\
+			BILLOW_SINGLE(func)\
+		)\
+		break;\
+	case RigidMulti:\
+		SET_BUILDER(\
+			xF = SIMDf_ADD(xF, xOffsetV);\
+			yF = SIMDf_ADD(yF, yOffsetV);\
+			zF = SIMDf_ADD(zF, zOffsetV);\
+			RIGIDMULTI_SINGLE(func)\
+		)\
+		break;\
+	}\
+	SIMD_ZERO_ALL();\
+}
+
 #define FILL_FRACTAL_SET(func) \
 void SIMD_LEVEL_CLASS::Fill##func##FractalSet(float* noiseSet, int xStart, int yStart, int zStart, int xSize, int ySize, int zSize, float scaleModifier)\
 {\
@@ -1375,6 +1450,8 @@ FILL_FRACTAL_SET(Perlin)
 
 FILL_SET(Simplex)
 FILL_FRACTAL_SET(Simplex)
+FILL_SET_WITH_OFFSET(Simplex)
+FILL_FRACTAL_SET_WITH_OFFSET(Simplex)
 
 //FILL_SET(WhiteNoise)
 

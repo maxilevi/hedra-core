@@ -9,9 +9,15 @@
 extern "C" {
 #endif
 
-    HEDRA_API FastNoiseSIMD* fastnoise_createObject();
+    HEDRA_API FastNoiseSIMD* fastnoise_createObject(int seed);
 
-    HEDRA_API float* fastnoise_getSimplexFractalSetWithFrequency(FastNoiseSIMD* pointer, int xStart, int yStart, int zStart, int xSize, int ySize, int zSize, float scaleModifier);
+    HEDRA_API void fastnoise_setSeed(FastNoiseSIMD* pointer, int seed);
+
+    HEDRA_API void fastnoise_setFrequency(FastNoiseSIMD* pointer, float frequency);
+
+    HEDRA_API float* fastnoise_getSimplexFractalSet(FastNoiseSIMD* pointer, float xOffset, float yOffset, float zOffset, int xSize, int ySize, int zSize, float xScale, float yScale, float zScale);
+
+    HEDRA_API float* fastnoise_getSimplexSet(FastNoiseSIMD* pointer, float xOffset, float yOffset, float zOffset, int xSize, int ySize, int zSize, float xScale, float yScale, float zScale);
 
     HEDRA_API void fastnoise_deleteObject(FastNoiseSIMD* pointer);
 

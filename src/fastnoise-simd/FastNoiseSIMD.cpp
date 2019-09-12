@@ -439,6 +439,21 @@ void FastNoiseSIMD::FillNoiseSet(float* noiseSet, int xStart, int yStart, int zS
 	}
 }
 
+void FastNoiseSIMD::FillNoiseSetWithOffset(float* noiseSet, float xOffset, float yOffset, float zOffset, int xSize, int ySize, int zSize)
+{
+    switch (m_noiseType)
+    {
+    case Simplex:
+        FillSimplexSetWithOffset(noiseSet, xOffset, yOffset, zOffset, xSize, ySize, zSize);
+        break;
+    case SimplexFractal:
+        FillSimplexFractalSetWithOffset(noiseSet, xOffset, yOffset, zOffset, xSize, ySize, zSize);
+        break;
+    default:
+        break;
+    }
+}
+
 void FastNoiseSIMD::FillNoiseSet(float* noiseSet, FastNoiseVectorSet* vectorSet, float xOffset, float yOffset, float zOffset)
 {
 	switch (m_noiseType)
