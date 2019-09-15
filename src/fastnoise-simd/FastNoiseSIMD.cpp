@@ -449,6 +449,27 @@ void FastNoiseSIMD::FillNoiseSetWithOffset(float* noiseSet, float xOffset, float
     case SimplexFractal:
         FillSimplexFractalSetWithOffset(noiseSet, xOffset, yOffset, zOffset, xSize, ySize, zSize);
         break;
+    case Perlin:
+        FillPerlinSetWithOffset(noiseSet, xOffset, yOffset, zOffset, xSize, ySize, zSize);
+        break;
+    case PerlinFractal:
+        FillPerlinFractalSetWithOffset(noiseSet, xOffset, yOffset, zOffset, xSize, ySize, zSize);
+        break;
+    case Value:
+        FillValueSetWithOffset(noiseSet, xOffset, yOffset, zOffset, xSize, ySize, zSize);
+        break;
+    case ValueFractal:
+        FillValueFractalSetWithOffset(noiseSet, xOffset, yOffset, zOffset, xSize, ySize, zSize);
+        break;
+    case Cubic:
+        FillCubicSetWithOffset(noiseSet, xOffset, yOffset, zOffset, xSize, ySize, zSize);
+        break;
+    case CubicFractal:
+        FillCubicFractalSetWithOffset(noiseSet, xOffset, yOffset, zOffset, xSize, ySize, zSize);
+        break;
+    case Cellular:
+        FillCellularSetWithOffset(noiseSet, xOffset, yOffset, zOffset, xSize, ySize, zSize);
+        break;
     default:
         break;
     }

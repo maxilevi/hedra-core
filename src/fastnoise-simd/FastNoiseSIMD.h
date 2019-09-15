@@ -265,6 +265,8 @@ public:
 	virtual void FillValueFractalSet(float* noiseSet, int xStart, int yStart, int zStart, int xSize, int ySize, int zSize, float scaleModifier = 1.0f) = 0;
 	virtual void FillValueSet(float* noiseSet, FastNoiseVectorSet* vectorSet, float xOffset = 0.0f, float yOffset = 0.0f, float zOffset = 0.0f) = 0;
 	virtual void FillValueFractalSet(float* noiseSet, FastNoiseVectorSet* vectorSet, float xOffset = 0.0f, float yOffset = 0.0f, float zOffset = 0.0f) = 0;
+    virtual void FillValueSetWithOffset(float* noiseSet, float xOffset, float yOffset, float zOffset, int xSize, int ySize, int zSize) = 0;
+    virtual void FillValueFractalSetWithOffset(float* noiseSet, float xOffset, float yOffset, float zOffset, int xSize, int ySize, int zSize) = 0;
 
 	float* GetPerlinSet(int xStart, int yStart, int zStart, int xSize, int ySize, int zSize, float scaleModifier = 1.0f);
 	float* GetPerlinFractalSet(int xStart, int yStart, int zStart, int xSize, int ySize, int zSize, float scaleModifier = 1.0f);
@@ -272,6 +274,8 @@ public:
 	virtual void FillPerlinFractalSet(float* noiseSet, int xStart, int yStart, int zStart, int xSize, int ySize, int zSize, float scaleModifier = 1.0f) = 0;
 	virtual void FillPerlinSet(float* noiseSet, FastNoiseVectorSet* vectorSet, float xOffset = 0.0f, float yOffset = 0.0f, float zOffset = 0.0f) = 0;
 	virtual void FillPerlinFractalSet(float* noiseSet, FastNoiseVectorSet* vectorSet, float xOffset = 0.0f, float yOffset = 0.0f, float zOffset = 0.0f) = 0;
+    virtual void FillPerlinSetWithOffset(float* noiseSet, float xOffset, float yOffset, float zOffset, int xSize, int ySize, int zSize) = 0;
+    virtual void FillPerlinFractalSetWithOffset(float* noiseSet, float xOffset, float yOffset, float zOffset, int xSize, int ySize, int zSize) = 0;
 
 	float* GetSimplexSet(int xStart, int yStart, int zStart, int xSize, int ySize, int zSize, float scaleModifier = 1.0f);
 	float* GetSimplexFractalSet(int xStart, int yStart, int zStart, int xSize, int ySize, int zSize, float scaleModifier = 1.0f);
@@ -285,6 +289,7 @@ public:
 	float* GetCellularSet(int xStart, int yStart, int zStart, int xSize, int ySize, int zSize, float scaleModifier = 1.0f);
 	virtual void FillCellularSet(float* noiseSet, int xStart, int yStart, int zStart, int xSize, int ySize, int zSize, float scaleModifier = 1.0f) = 0;
 	virtual void FillCellularSet(float* noiseSet, FastNoiseVectorSet* vectorSet, float xOffset = 0.0f, float yOffset = 0.0f, float zOffset = 0.0f) = 0;
+    virtual void FillCellularSetWithOffset(float* noiseSet, float xOffset, float yOffset, float zOffset, int xSize, int ySize, int zSize) = 0;
 	
 	float* GetCubicSet(int xStart, int yStart, int zStart, int xSize, int ySize, int zSize, float scaleModifier = 1.0f);
 	float* GetCubicFractalSet(int xStart, int yStart, int zStart, int xSize, int ySize, int zSize, float scaleModifier = 1.0f);
@@ -292,6 +297,8 @@ public:
 	virtual void FillCubicFractalSet(float* noiseSet, int xStart, int yStart, int zStart, int xSize, int ySize, int zSize, float scaleModifier = 1.0f) = 0;
 	virtual void FillCubicSet(float* noiseSet, FastNoiseVectorSet* vectorSet, float xOffset = 0.0f, float yOffset = 0.0f, float zOffset = 0.0f) = 0;
 	virtual void FillCubicFractalSet(float* noiseSet, FastNoiseVectorSet* vectorSet, float xOffset = 0.0f, float yOffset = 0.0f, float zOffset = 0.0f) = 0;
+    virtual void FillCubicSetWithOffset(float* noiseSet, float xOffset, float yOffset, float zOffset, int xSize, int ySize, int zSize) = 0;
+    virtual void FillCubicFractalSetWithOffset(float* noiseSet, float xOffset, float yOffset, float zOffset, int xSize, int ySize, int zSize) = 0;
 
 	virtual ~FastNoiseSIMD() { }
 

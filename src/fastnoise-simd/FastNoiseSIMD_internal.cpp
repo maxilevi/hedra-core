@@ -1444,9 +1444,13 @@ void SIMD_LEVEL_CLASS::Fill##func##FractalSet(float* noiseSet, int xStart, int y
 
 FILL_SET(Value)
 FILL_FRACTAL_SET(Value)
+FILL_SET_WITH_OFFSET(Value)
+FILL_FRACTAL_SET_WITH_OFFSET(Value)
 
 FILL_SET(Perlin)
 FILL_FRACTAL_SET(Perlin)
+FILL_SET_WITH_OFFSET(Perlin)
+FILL_FRACTAL_SET_WITH_OFFSET(Perlin)
 
 FILL_SET(Simplex)
 FILL_FRACTAL_SET(Simplex)
@@ -1457,6 +1461,8 @@ FILL_FRACTAL_SET_WITH_OFFSET(Simplex)
 
 FILL_SET(Cubic)
 FILL_FRACTAL_SET(Cubic)
+FILL_SET_WITH_OFFSET(Cubic)
+FILL_FRACTAL_SET_WITH_OFFSET(Cubic)
 
 #ifdef FN_ALIGNED_SETS
 #define SIZE_MASK
@@ -2038,7 +2044,7 @@ case Natural:\
 	break;\
 }
 
-void SIMD_LEVEL_CLASS::FillCellularSet(float* noiseSet, int xStart, int yStart, int zStart, int xSize, int ySize, int zSize, float scaleModifier)
+void SIMD_LEVEL_CLASS::DoFillCellularSetWithOffset(float* noiseSet, int xStart, int yStart, int zStart, int xSize, int ySize, int zSize, float scaleModifier, float xOffset, float yOffset, float zOffset)
 {
 	assert(noiseSet);
 	SIMD_ZERO_ALL();
@@ -2050,6 +2056,9 @@ void SIMD_LEVEL_CLASS::FillCellularSet(float* noiseSet, int xStart, int yStart, 
 	SIMDf xFreqV = SIMDf_SET(scaleModifier * m_xScale);
 	SIMDf yFreqV = SIMDf_SET(scaleModifier * m_yScale);
 	SIMDf zFreqV = SIMDf_SET(scaleModifier * m_zScale);
+	SIMDf xOffsetV = SIMDf_SET(scaleModifier * xOffset);
+	SIMDf yOffsetV = SIMDf_SET(scaleModifier * yOffset);
+	SIMDf zOffsetV = SIMDf_SET(scaleModifier * zOffset);
 	SIMDf cellJitterV = SIMDf_SET(m_cellularJitter);
 
 	NoiseLookupSettings nls;
@@ -2092,18 +2101,43 @@ void SIMD_LEVEL_CLASS::FillCellularSet(float* noiseSet, int xStart, int yStart, 
 		switch (m_cellularDistanceFunction)
 		{
 		case Euclidean:
-			SET_BUILDER(result = FUNC(CellularLookupEuclideanSingle)(seedV, xF, yF, zF, cellJitterV, nls))
-				break; \
+			SET_BUILDER(
+				xF = SIMDf_ADD(xF, xOffsetV);
+				yF = SIMDf_ADD(yF, yOffsetV);
+				zF = SIMDf_ADD(zF, zOffsetV);
+				result = FUNC(CellularLookupEuclideanSingle)(seedV, xF, yF, zF, cellJitterV, nls)
+			)
+			break; \
 		case Manhattan:
-			SET_BUILDER(result = FUNC(CellularLookupManhattanSingle)(seedV, xF, yF, zF, cellJitterV, nls))
-				break; \
+			SET_BUILDER(
+				xF = SIMDf_ADD(xF, xOffsetV);
+				yF = SIMDf_ADD(yF, yOffsetV);
+				zF = SIMDf_ADD(zF, zOffsetV);
+				result = FUNC(CellularLookupManhattanSingle)(seedV, xF, yF, zF, cellJitterV, nls)
+			)
+			break; \
 		case Natural:
-			SET_BUILDER(result = FUNC(CellularLookupNaturalSingle)(seedV, xF, yF, zF, cellJitterV, nls))
-				break;
+			SET_BUILDER(
+				xF = SIMDf_ADD(xF, xOffsetV);
+				yF = SIMDf_ADD(yF, yOffsetV);
+				zF = SIMDf_ADD(zF, zOffsetV);
+				result = FUNC(CellularLookupNaturalSingle)(seedV, xF, yF, zF, cellJitterV, nls)
+			)
+			break;
 		}
 		break;
 	}
 	SIMD_ZERO_ALL();
+}
+
+void SIMD_LEVEL_CLASS::FillCellularSet(float* noiseSet, int xStart, int yStart, int zStart, int xSize, int ySize, int zSize, float scaleModifier)
+{
+	SIMD_LEVEL_CLASS::DoFillCellularSetWithOffset(noiseSet, xStart, yStart, zStart, xSize, ySize, zSize, scaleModifier, 0, 0, 0);
+}
+
+void SIMD_LEVEL_CLASS::FillCellularSetWithOffset(float* noiseSet, float xOffset, float yOffset, float zOffset, int xSize, int ySize, int zSize)
+{
+	SIMD_LEVEL_CLASS::DoFillCellularSetWithOffset(noiseSet, 0, 0, 0, xSize, ySize, zSize, 1, xOffset, yOffset, zOffset);
 }
 
 #define CELLULAR_MULTI_VECTOR(returnFunc)\
