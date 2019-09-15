@@ -1263,7 +1263,7 @@ size_t meshopt_simplify(unsigned int* destination, const unsigned int* indices, 
 	return result_count;
 }
 
-size_t meshopt_simplifySloppy(unsigned int* destination, const unsigned int* indices, size_t index_count, const float* vertex_positions_data, size_t vertex_count, const float* blacklist_vertex_data, size_t blacklist_vertex_count, size_t vertex_positions_stride, size_t target_index_count)
+size_t meshopt_simplifySloppy(unsigned int* destination, const unsigned int* indices, size_t index_count, const float* vertex_positions_data, size_t vertex_count, size_t vertex_positions_stride, size_t target_index_count)
 {
 	using namespace meshopt;
 
@@ -1282,9 +1282,6 @@ size_t meshopt_simplifySloppy(unsigned int* destination, const unsigned int* ind
 
 	Vector3* vertex_positions = allocator.allocate<Vector3>(vertex_count);
 	rescalePositions(vertex_positions, vertex_positions_data, vertex_count, vertex_positions_stride);
-
-    Vector3* vertex_blacklist = allocator.allocate<Vector3>(blacklist_vertex_count);
-    rescalePositions(vertex_blacklist, blacklist_vertex_data, blacklist_vertex_count, vertex_positions_stride);
 
 	// find the optimal grid size using guided binary search
 #if TRACE
