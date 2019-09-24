@@ -6,8 +6,11 @@
 #define HEDRACORE_MESHER_H
 
 
-class mesher {
+#include "painter.h"
 
+
+struct mesher {
+    painter* painter;
 };
 
 

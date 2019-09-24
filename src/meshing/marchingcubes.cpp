@@ -1,7 +1,7 @@
 /*
  * Created by Maximiliano Levi on 17/09/2019.
  */
-
+/*
 #include "marchingcubes.h"
 #include "tables.h"
 #include "vertexData.h"
@@ -19,12 +19,12 @@ int getCubeIndex(double level, gridCell cell) {
     return cubeIndex;
 }
 
-static bool marchingcubes::usable(double level, gridCell cell)
+bool marchingcubes::usable(double level, gridCell cell)
 {
     return EDGE_TABLE[getCubeIndex(level, cell)] != 0;
 }
 
-static vec3 vertexInterpolation(double level, vec3 P1, vec3 P2, double valp1, double valp2)
+vec3 vertexInterpolation(double level, vec3 P1, vec3 P2, double valp1, double valp2)
 {
     vec4 p1 = vec4(P1, (float) valp1);
     vec4 p2 = vec4(P2, (float) valp2);
@@ -44,16 +44,16 @@ static vec3 vertexInterpolation(double level, vec3 P1, vec3 P2, double valp1, do
     return p;
 }
 
-static int marchingcubes::polygonise(double level, const gridCell& cell, vec3* vertexBuffer, triangle* triangleBuffer)
+int marchingcubes::polygonise(double level, const gridCell& cell, vec3* vertexBuffer, triangle* triangleBuffer)
 {
     int triangleCount = 0;
     int cubeIndex = getCubeIndex(level, cell);
 
-    /* Cube is entirely in/out of the surface */
+    /* Cube is entirely in/out of the surface
     if (EDGE_TABLE[cubeIndex] == 0)
         return triangleCount;
 
-    /* Find the vertices where the surface intersects the cube */
+    /* Find the vertices where the surface intersects the cube
     if ( (EDGE_TABLE[cubeIndex] & 1) > 0 )
         vertexBuffer[0] = vertexInterpolation(level, cell.position[0], cell.position[1], cell.density[0], cell.density[1]);
 
@@ -90,7 +90,7 @@ static int marchingcubes::polygonise(double level, const gridCell& cell, vec3* v
     if ( (EDGE_TABLE[cubeIndex] & 2048) > 0 )
         vertexBuffer[11] = vertexInterpolation(level, cell.position[3], cell.position[7], cell.density[3], cell.density[7]);
 
-    /* Create the triangle */
+    /* Create the triangle
     for (int i = 0; TRIANGLE_TABLE[cubeIndex][i] != -1; i += 3)
     {
         triangleBuffer[triangleCount].vertices[0] = vertexBuffer[TRIANGLE_TABLE[cubeIndex][i + 0]];
@@ -100,7 +100,7 @@ static int marchingcubes::polygonise(double level, const gridCell& cell, vec3* v
     }
 }
 
-static void marchingcubes::build(vertexData* data, const vec4& templateColor, const triangle* triangleBuffer, int triangleCount, bool orientation)
+void marchingcubes::build(vertexData* data, const vec4& templateColor, const triangle* triangleBuffer, int triangleCount, bool orientation)
 {
     if (triangleCount == 2)
     {
@@ -138,3 +138,4 @@ static void marchingcubes::build(vertexData* data, const vec4& templateColor, co
         data->colors.push_back(templateColor);
     }
 }
+*/

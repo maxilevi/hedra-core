@@ -17,20 +17,20 @@ struct vec2 {
     vec2(float X, float Y) : X(X), Y(Y){
     }
 
-    inline vec2 operator+(vec2 lhs, vec2 const& rhs ){
-        return vec2(lhs.X + rhs.X, lhs.Y + rhs.Y);
+    inline vec2 operator+(const vec2& p2){
+        return vec2(X + p2.X, Y + p2.Y);
     }
 
-    inline vec2 operator-(vec2 lhs, vec2 const& rhs){
-        return vec2(lhs.X - rhs.X, lhs.Y - rhs.Y);
+    inline vec2 operator-(const vec2& p2){
+        return vec2(X - p2.X, Y - p2.Y);
     }
 
-    inline vec2 operator*(vec2 lhs, float rhs) {
-        return vec2(lhs.X * rhs, lhs.Y * rhs);
+    inline vec2 operator*(const float& scalar) {
+        return vec2(X * scalar, Y * scalar);
     }
 
-    inline vec2 operator/(vec2 lhs, float rhs) {
-        return vec2(lhs.X / rhs, lhs.Y / rhs);
+    inline vec2 operator/(const float& scalar) {
+        return vec2(X / scalar, Y / scalar);
     }
 
     inline float lengthSquared(){
@@ -49,20 +49,20 @@ struct vec3 {
     vec3(float X, float Y, float Z) : X(X), Y(Y), Z(Z){
     }
 
-    inline vec3 operator+(vec3 lhs, vec3 rhs ){
-        return vec3(lhs.X + rhs.X, lhs.Y + rhs.Y, lhs.Z + rhs.Z);
+    inline vec3 operator+(const vec3& p2){
+        return vec3(X + p2.X, Y + p2.Y, Z + p2.Z);
     }
 
-    inline vec3 operator-(vec3 lhs, vec3 rhs){
-        return vec3(lhs.X - rhs.X, lhs.Y - rhs.Y, lhs.Z - rhs.Z);
+    inline vec3 operator-(const vec3& p2){
+        return vec3(X - p2.X, Y - p2.Y, Z - p2.Z);
     }
 
-    inline vec3 operator*(vec3 lhs, float rhs) {
-        return vec3(lhs.X * rhs, lhs.Y * rhs, lhs.Z * rhs);
+    inline vec3 operator*(const float& rhs) {
+        return vec3(X * rhs, Y * rhs, Z * rhs);
     }
 
-    inline vec3 operator/(vec3 lhs, float rhs) {
-        return vec3(lhs.X / rhs, lhs.Y / rhs, lhs.Z / rhs);
+    inline vec3 operator/(const float& rhs) {
+        return vec3(X / rhs, Y / rhs, Z / rhs);
     }
 
     inline float length(){
@@ -97,20 +97,20 @@ struct vec4 {
         return vec3(X,Y,Z);
     }
 
-    inline vec4 operator+(vec4 lhs, vec4 rhs ){
-        return vec4(lhs.X + rhs.X, lhs.Y + rhs.Y, lhs.Z + rhs.Z, lhs.W + rhs.W);
+    inline vec4 operator+(const vec4& p2){
+        return vec4(X + p2.X, Y + p2.Y, Z + p2.Z, W + p2.W);
     }
 
-    inline vec4 operator-(vec4 lhs, vec4 rhs){
-        return vec4(lhs.X - rhs.X, lhs.Y - rhs.Y, lhs.Z - rhs.Z, lhs.W - rhs.W);
+    inline vec4 operator-(const vec4& p2){
+        return vec4(X - p2.X, Y - p2.Y, Z - p2.Z, W - p2.W);
     }
 
-    inline vec4 operator*(vec4 lhs, float rhs) {
-        return vec4(lhs.X * rhs, lhs.Y * rhs, lhs.Z * rhs, lhs.W * rhs);
+    inline vec4 operator*(const float& rhs) {
+        return vec4(X * rhs, Y * rhs, Z * rhs, W * rhs);
     }
 
-    inline vec4 operator/(vec4 lhs, float rhs) {
-        return vec4(lhs.X / rhs, lhs.Y / rhs, lhs.Z / rhs, lhs.W / rhs);
+    inline vec4 operator/(const float& rhs) {
+        return vec4(X / rhs, Y / rhs, Z / rhs, W / rhs);
     }
 };
 

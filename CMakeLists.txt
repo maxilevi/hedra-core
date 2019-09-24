@@ -41,7 +41,7 @@ target_compile_options(noise_obj PRIVATE /GL-)
 add_library(meshoptimizer_obj OBJECT ${MESHOPTIMIZER_SOURCES})
 target_compile_options(meshoptimizer_obj PRIVATE /W4 /WX)
 
-add_library(hedracore SHARED $<TARGET_OBJECTS:noise_obj> $<TARGET_OBJECTS:meshoptimizer_obj> src/hedra.h src/hedra.cpp src/vectormath.h src/meshing/marchingcubes.cpp src/meshing/marchingcubes.h src/meshing/tables.h src/meshing/vertexData.h src/meshing/mesher.cpp src/meshing/mesher.h src/meshing/painter.cpp src/meshing/painter.h)
+add_library(hedracore SHARED $<TARGET_OBJECTS:noise_obj> $<TARGET_OBJECTS:meshoptimizer_obj> src/hedra.h src/hedra.cpp src/vectormath.h src/meshing/marchingcubes.cpp src/meshing/marchingcubes.h src/meshing/tables.h src/meshing/vertexData.h src/meshing/mesher.cpp src/meshing/mesher.h src/meshing/painter.cpp src/meshing/painter.h src/meshing/block.h src/mathf.h src/meshing/blocktype.h)
 target_include_directories(hedracore INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 set_target_properties(hedracore PROPERTIES OUTPUT_NAME "hedracore")

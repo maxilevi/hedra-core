@@ -18,11 +18,11 @@ struct triangle {
 };
 
 class marchingcubes {
-
+/*
 public:
     static bool usable(double level, gridCell cell);
     static int polygonise(double level, const gridCell& cell, vec3* vertexBuffer, triangle* triangleBuffer);
-    static void build(vertexData* data, const vec4& templateColor, const triangle* triangleBuffer, int triangleCount, bool orientation);
+    static void build(vertexData* data, const vec4& templateColor, const triangle* triangleBuffer, int triangleCount, bool orientation);*/
 };
 
 

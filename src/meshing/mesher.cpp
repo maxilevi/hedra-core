@@ -4,8 +4,12 @@
 
 #include "mesher.h"
 #include "marchingcubes.h"
+#include "block.h"
+#include "painter.h"
 
-void polygoniseCell(SampledBlock*** Gridgrid, const gridCell& cell, bool processColors, const bool* next, vertexData* staticData, vec3* vertexBuffer, triangle* triangleBuffer)
+
+/*
+void polygoniseCell(block* grid, const gridCell& cell, bool processColors, const bool* next, vertexData* staticData, vec3* vertexBuffer, triangle* triangleBuffer)
 {
     int triangleCount = marchingcubes::polygonise(0, cell, vertexBuffer, triangleBuffer);
     vec4 color;
@@ -19,7 +23,7 @@ void polygoniseCell(SampledBlock*** Gridgrid, const gridCell& cell, bool process
     marchingcubes::build(staticData, color, triangleBuffer, triangleCount, next);
 }
 
-void iterateAndBuild(SampledBlock[][][] densityGrid, Block[][][] Blocks, ref bool failed, ref bool hasWater, bool ProcessWater, bool ProcessColors, RegionCache Cache, VertexData blockData, VertexData waterData)
+void iterateAndBuild(block* grid, ref bool failed, ref bool hasWater, bool ProcessWater, bool ProcessColors, RegionCache Cache, VertexData blockData, VertexData waterData)
 {
     bool next = false;
     bool failed = false;
@@ -38,4 +42,4 @@ void iterateAndBuild(SampledBlock[][][] densityGrid, Block[][][] Blocks, ref boo
             }
         }
     }
-}
+}*/
