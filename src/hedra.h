@@ -37,6 +37,7 @@ extern "C" {
 
     HEDRA_API void fastnoise_freeNoise(float* pointer);
 
+    HEDRA_API void fastnoise_setCellularReturnType(FastNoiseSIMD* pointer, FastNoiseSIMD::CellularReturnType returnType);
 
 #ifdef __cplusplus
 }

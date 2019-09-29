@@ -84,34 +84,15 @@ HEDRA_API float* fastnoise_getValueFractalSet(FastNoiseSIMD* pointer, float xOff
     return getNoiseSet(pointer, xOffset, yOffset, zOffset, xSize, ySize, zSize, xScale, yScale, zScale, FastNoiseSIMD::NoiseType::ValueFractal);
 }
 
+HEDRA_API void fastnoise_setCellularReturnType(FastNoiseSIMD* pointer, FastNoiseSIMD::CellularReturnType returnType)
+{
+    pointer->SetCellularReturnType(returnType);
+}
+
 HEDRA_API void fastnoise_setFrequency(FastNoiseSIMD* pointer, float frequency)
 {
     pointer->SetFrequency(frequency);
 }
-
-HEDRA_API mesher* meshing_initialize(block* samplingGrid, neighbourLookup delegate, int sampleWidth, int sampleHeight, int samplingGridSizeX, int samplingGridSizeY, int boundsX, int boundsY) {
-    auto* helper = new painter();
-    helper->samplingGrid = samplingGrid;
-    helper->_sampleWidth = sampleWidth;
-    helper->_sampleHeight = sampleHeight;
-    helper->samplingGridSizeX = samplingGridSizeX;
-    helper->samplingGridSizeY = samplingGridSizeX;
-    helper->_boundsX = boundsX;
-    helper->_boundsY = boundsY;
-    helper->_boundsZ = boundsX;
-    helper->getNeighbourBlock = delegate;
-    auto* instance = new mesher();
-    instance->painter = helper;
-    return instance;
-}
-
-HEDRA_API void meshing_fillCell(gridCell*)
-
-HEDRA_API void meshing_destroy(mesher* object){
-    delete object;
-}
-
-
 
 #ifdef __cplusplus
 }
