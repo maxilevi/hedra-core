@@ -89,9 +89,44 @@ HEDRA_API void fastnoise_setCellularReturnType(FastNoiseSIMD* pointer, FastNoise
     pointer->SetCellularReturnType(returnType);
 }
 
+HEDRA_API void fastnoise_setFractalGain(FastNoiseSIMD* pointer, float gain)
+{
+    pointer->SetFractalGain(gain);
+}
+
+HEDRA_API void fastnoise_setFractalLacunarity(FastNoiseSIMD* pointer, float lacunarity)
+{
+    pointer->SetFractalLacunarity(lacunarity);
+}
+
+HEDRA_API void fastnoise_setFractalOctaves(FastNoiseSIMD* pointer, int octaves)
+{
+    pointer->SetFractalOctaves(octaves);
+}
+
+HEDRA_API void fastnoise_setFractalType(FastNoiseSIMD* pointer, FastNoiseSIMD::FractalType fractalType)
+{
+    pointer->SetFractalType(fractalType);
+}
+
 HEDRA_API void fastnoise_setFrequency(FastNoiseSIMD* pointer, float frequency)
 {
     pointer->SetFrequency(frequency);
+}
+
+HEDRA_API void fastnoise_setPerturbType(FastNoiseSIMD* pointer, FastNoiseSIMD::PerturbType perturbType)
+{
+    pointer->SetPerturbType(perturbType);
+}
+
+HEDRA_API void fastnoise_setPerturbAmp(FastNoiseSIMD* pointer, float amplitude)
+{
+    pointer->SetPerturbAmp(amplitude);
+}
+
+HEDRA_API void fastnoise_setPerturbFrequency(FastNoiseSIMD* pointer, float frequency)
+{
+    pointer->SetPerturbFrequency(frequency);
 }
 
 #ifdef __cplusplus

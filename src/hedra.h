@@ -39,6 +39,20 @@ extern "C" {
 
     HEDRA_API void fastnoise_setCellularReturnType(FastNoiseSIMD* pointer, FastNoiseSIMD::CellularReturnType returnType);
 
+    HEDRA_API void fastnoise_setFractalGain(FastNoiseSIMD* pointer, float gain);
+
+    HEDRA_API void fastnoise_setFractalLacunarity(FastNoiseSIMD* pointer, float lacunarity);
+
+    HEDRA_API void fastnoise_setFractalOctaves(FastNoiseSIMD* pointer, int octaves);
+
+    HEDRA_API void fastnoise_setFractalType(FastNoiseSIMD* pointer, FastNoiseSIMD::FractalType fractalType);
+
+    HEDRA_API void fastnoise_setPerturbAmp(FastNoiseSIMD* pointer, float amplitude);
+
+    HEDRA_API void fastnoise_setPerturbFrequency(FastNoiseSIMD* pointer, float frequency);
+
+    HEDRA_API void fastnoise_setPerturbType(FastNoiseSIMD* pointer, FastNoiseSIMD::PerturbType perturbType);
+
 #ifdef __cplusplus
 }
 #endif
