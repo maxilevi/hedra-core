@@ -1162,7 +1162,7 @@ case GradientFractal_Normalise:\
 	}break;\
 }
 
-#define SET_BUILDER(f)\
+#define SET_BUILDER_WITHOUT_PERTURB(f)\
 if ((zSize & (VECTOR_SIZE - 1)) == 0)\
 {\
 	SIMDi yBase = SIMDi_SET(yStart);\
@@ -1185,7 +1185,6 @@ if ((zSize & (VECTOR_SIZE - 1)) == 0)\
 			SIMDf yF = yf;\
 			SIMDf zF = SIMDf_MUL(SIMDf_CONVERT_TO_FLOAT(z), zFreqV);\
 			\
-			PERTURB_SWITCH()\
 			SIMDf result;\
 			f;\
 			SIMDf_STORE(&noiseSet[index], result);\
@@ -1200,7 +1199,6 @@ if ((zSize & (VECTOR_SIZE - 1)) == 0)\
 				yF = yf;\
 				zF = SIMDf_MUL(SIMDf_CONVERT_TO_FLOAT(z), zFreqV);\
 				\
-				PERTURB_SWITCH()\
 				SIMDf result;\
 				f;\
 				SIMDf_STORE(&noiseSet[index], result);\
@@ -1233,7 +1231,6 @@ else\
 		SIMDf yF = SIMDf_MUL(SIMDf_CONVERT_TO_FLOAT(y), yFreqV);\
 		SIMDf zF = SIMDf_MUL(SIMDf_CONVERT_TO_FLOAT(z), zFreqV);\
 		\
-		PERTURB_SWITCH()\
 		SIMDf result;\
 		f;\
 		SIMDf_STORE(&noiseSet[index], result);\
@@ -1247,11 +1244,16 @@ else\
 	SIMDf yF = SIMDf_MUL(SIMDf_CONVERT_TO_FLOAT(y), yFreqV);\
 	SIMDf zF = SIMDf_MUL(SIMDf_CONVERT_TO_FLOAT(z), zFreqV);\
 	\
-	PERTURB_SWITCH()\
 	SIMDf result;\
 	f;\
 	STORE_LAST_RESULT(&noiseSet[index], result);\
 }
+
+#define SET_BUILDER(f)\
+	SET_BUILDER_WITHOUT_PERTURB(\
+		PERTURB_SWITCH();\
+		f;\
+	)\
 
 // FBM SINGLE
 #define FBM_SINGLE(f)\
@@ -1345,6 +1347,11 @@ void SIMD_LEVEL_CLASS::Fill##func##Set(float* noiseSet, int xStart, int yStart, 
 	int yStart = 0;\
 	int zStart = 0;\
 
+#define ADD_OFFSET()\
+	xF = SIMDf_ADD(xF, xOffsetV);\
+	yF = SIMDf_ADD(yF, yOffsetV);\
+	zF = SIMDf_ADD(zF, zOffsetV);\
+
 #define FILL_SET_WITH_OFFSET(func) \
 void SIMD_LEVEL_CLASS::Fill##func##SetWithOffset(float* noiseSet, float xOffset, float yOffset, float zOffset, int xSize, int ySize, int zSize)\
 {\
@@ -1355,10 +1362,9 @@ void SIMD_LEVEL_CLASS::Fill##func##SetWithOffset(float* noiseSet, float xOffset,
 	INIT_PERTURB_VALUES();\
 	INIT_OFFSET_VARIABLES();\
 	\
-	SET_BUILDER(\
-		xF = SIMDf_ADD(xF, xOffsetV);\
-		yF = SIMDf_ADD(yF, yOffsetV);\
-		zF = SIMDf_ADD(zF, zOffsetV);\
+	SET_BUILDER_WITHOUT_PERTURB(\
+		ADD_OFFSET();\
+		PERTURB_SWITCH();\
 		result = FUNC(func##Single)(seedV, xF, yF, zF)\
 	)\
 	\
@@ -1382,26 +1388,23 @@ void SIMD_LEVEL_CLASS::Fill##func##FractalSetWithOffset(float* noiseSet, float x
 	switch(m_fractalType)\
 	{\
 	case FBM:\
-		SET_BUILDER(\
-			xF = SIMDf_ADD(xF, xOffsetV);\
-			yF = SIMDf_ADD(yF, yOffsetV);\
-			zF = SIMDf_ADD(zF, zOffsetV);\
+		SET_BUILDER_WITHOUT_PERTURB(\
+			ADD_OFFSET();\
+			PERTURB_SWITCH();\
 			FBM_SINGLE(func)\
 		)\
 		break;\
 	case Billow:\
-		SET_BUILDER(\
-			xF = SIMDf_ADD(xF, xOffsetV);\
-			yF = SIMDf_ADD(yF, yOffsetV);\
-			zF = SIMDf_ADD(zF, zOffsetV);\
+		SET_BUILDER_WITHOUT_PERTURB(\
+			ADD_OFFSET();\
+			PERTURB_SWITCH();\
 			BILLOW_SINGLE(func)\
 		)\
 		break;\
 	case RigidMulti:\
-		SET_BUILDER(\
-			xF = SIMDf_ADD(xF, xOffsetV);\
-			yF = SIMDf_ADD(yF, yOffsetV);\
-			zF = SIMDf_ADD(zF, zOffsetV);\
+		SET_BUILDER_WITHOUT_PERTURB(\
+			ADD_OFFSET();\
+			PERTURB_SWITCH();\
 			RIGIDMULTI_SINGLE(func)\
 		)\
 		break;\
