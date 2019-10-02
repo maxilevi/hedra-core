@@ -1,6 +1,6 @@
-name: hedra-core CI
+name: build
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   windows:
