@@ -1,18 +1,22 @@
-name: C/C++ CI
+name: hedra-core CI
 
 on: [push]
 
 jobs:
-  build:
-
-    runs-on: windows-latest
-    
+  windows:
+    name: Test on ${{ matrix.os }} with arch ${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        arch: [Win32, x64]
+        os: [windows-2016, windows-2019]
     steps:
     - uses: actions/checkout@v1
     - name: cmake configure
-      run: cmake . -A x64
+      run: cmake . -A ${{matrix.arch}}
     - name: cmake build
-      run: cmake --build . -- -property:Configuration=Release -verbosity:minimal
-    - name: dir
-      shell: bash
-      run: ls
+      run: cmake --build . -- -property:Configuration=Release
+    - uses: actions/upload-artifact@v1
+      with:
+        name: hedra-core-${{matrix.arch}}-${{ matrix.os }}
+        path: Release/hedracore.dll
