@@ -10,9 +10,9 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: cmake configure
-      run: cmake configure
-    - name: cmake hedracore
-      run: cmake hedracore
+      run: cmake . -A x64
+    - name: cmake build
+      run: cmake --build . -- -property:Configuration=Release -verbosity:minimal
     - name: dir
       shell: bash
       run: ls
