@@ -36,10 +36,10 @@ set_source_files_properties(src/fastnoise-simd/FastNoiseSIMD_avx2.cpp PROPERTIES
 set_source_files_properties(src/fastnoise-simd/FastNoiseSIMD_avx512.cpp PROPERTIES COMPILE_FLAGS /arch:AVX)
 
 add_library(noise_obj OBJECT ${FASTNOISE_SOURCES})
-target_compile_options(noise_obj PRIVATE /GL-)
+target_compile_options(noise_obj PRIVATE /GL- /MT)
 
 add_library(meshoptimizer_obj OBJECT ${MESHOPTIMIZER_SOURCES})
-target_compile_options(meshoptimizer_obj PRIVATE /W4 /WX)
+target_compile_options(meshoptimizer_obj PRIVATE /W4 /WX /MT)
 
 add_library(hedracore SHARED $<TARGET_OBJECTS:noise_obj> $<TARGET_OBJECTS:meshoptimizer_obj> src/hedra.h src/hedra.cpp src/vectormath.h src/meshing/marchingcubes.cpp src/meshing/marchingcubes.h src/meshing/tables.h src/meshing/vertexData.h src/meshing/mesher.cpp src/meshing/mesher.h src/meshing/painter.cpp src/meshing/painter.h src/meshing/block.h src/mathf.h src/meshing/blocktype.h)
 target_include_directories(hedracore INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/src")
@@ -47,7 +47,7 @@ target_include_directories(hedracore INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/src"
 set_target_properties(hedracore PROPERTIES OUTPUT_NAME "hedracore")
 
 if(MSVC)
-	target_compile_options(hedracore PRIVATE)
+	target_compile_options(hedracore PRIVATE /MT)
 else()
 	target_compile_options(hedracore PRIVATE -Wall -Wextra -Werror)
 endif()
