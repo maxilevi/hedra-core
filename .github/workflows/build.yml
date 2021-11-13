@@ -11,13 +11,20 @@ jobs:
         arch: [Win32, x64]
         os: [windows-2019]
         include:
-        - arch: x86
+        - arch: _
           os: ubuntu-18.04
           experimental: true
     steps:
     - uses: actions/checkout@v1
-    - name: cmake configure
+    
+    - name: cmake configure windows
+      if: ${{ matrix.os != ubuntu-18.04 }}
       run: cmake . -A ${{matrix.arch}}
+      
+    - name: cmake configure ubuntu
+      if: ${{ matrix.os != windows-2019 }}
+      run: cmake .
+      
     - name: cmake build
       run: cmake --build . -- -property:Configuration=Release
     - uses: actions/upload-artifact@v1
