@@ -12,17 +12,16 @@ jobs:
         os: [windows-2019]
         include:
         - arch: _
-          os: ubuntu-18.04
+          os: ubuntu-latest
           experimental: true
     steps:
     - uses: actions/checkout@v1
     
-    - name: cmake configure windows
-      if: ${{ matrix.os != "ubuntu-18.04" }}
+    - name: cmake configure
+    - if: matrix.os == 'windows-2019'
       run: cmake . -A ${{matrix.arch}}
-      
-    - name: cmake configure ubuntu
-      if: ${{ matrix.os != "windows-2019" }}
+
+    - if: matrix.os == 'ubuntu-latest'
       run: cmake .
       
     - name: cmake build
