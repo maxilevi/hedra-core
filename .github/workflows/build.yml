@@ -17,11 +17,12 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     
-    - name: cmake configure
-    - if: matrix.os == 'windows-2019'
+    - name: cmake configure windows
+      if: matrix.os == 'windows-2019'
       run: cmake . -A ${{matrix.arch}}
-
-    - if: matrix.os == 'ubuntu-latest'
+        
+    - name: cmake configure ubuntu
+      if: matrix.os == 'ubuntu-latest'
       run: cmake .
       
     - name: cmake build
