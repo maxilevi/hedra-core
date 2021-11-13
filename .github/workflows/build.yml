@@ -11,7 +11,7 @@ jobs:
         arch: [Win32, x64]
         os: [windows-2019]
         include:
-        - arch: _
+        - arch: x64
           os: ubuntu-latest
           experimental: true
     steps:
