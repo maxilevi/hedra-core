@@ -11,7 +11,7 @@
 
 typedef block (*neighbourLookup)(int, int, int);
 
-struct painter {
+class painter {
     block* samplingGrid;
     int _sampleWidth;
     int _sampleHeight;

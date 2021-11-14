@@ -1,5 +1,10 @@
 project(hedracore C CXX)
 cmake_minimum_required(VERSION 3.0)
+set(CMAKE_BUILD_TYPE RELEASE)
+
+if(GCC)
+    set(CMAKE_CXX_FLAGS "-fPIC")
+endif()
 
 set(MESHOPTIMIZER_SOURCES
     src/export.h
@@ -39,7 +44,8 @@ if(MSVC)
 else()
 	set_source_files_properties(src/fastnoise-simd/FastNoiseSIMD_sse2.cpp PROPERTIES COMPILE_FLAGS -msse2)
 	set_source_files_properties(src/fastnoise-simd/FastNoiseSIMD_sse41.cpp PROPERTIES COMPILE_FLAGS -msse4.1)
-	set_source_files_properties(src/fastnoise-simd/FastNoiseSIMD_avx2.cpp PROPERTIES COMPILE_FLAGS -mavx2)
+	#set_source_files_properties(src/fastnoise-simd/FastNoiseSIMD_avx2.cpp PROPERTIES COMPILE_FLAGS -mavx)
+    set_source_files_properties(src/fastnoise-simd/FastNoiseSIMD_avx2.cpp PROPERTIES COMPILE_FLAGS -march=native)
 	set_source_files_properties(src/fastnoise-simd/FastNoiseSIMD_avx512.cpp PROPERTIES COMPILE_FLAGS -mavx512f)
 endif()
 
