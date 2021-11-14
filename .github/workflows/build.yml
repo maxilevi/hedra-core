@@ -18,7 +18,7 @@ jobs:
       run: cmake . -A ${{matrix.arch}}
       
     - name: cmake build
-      run: cmake --build . -- -property:Configuration=Release
+      run: cmake --build . -- /p:Configuration=Release
 
     - uses: actions/upload-artifact@v1
       with:
