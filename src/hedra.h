@@ -3,7 +3,8 @@
  */
 
 #include "fastnoise-simd/FastNoiseSIMD.h"
-#define HEDRA_API __declspec(dllexport)
+#include "export.h"
+#define HEDRA_API EXPORT
 
 #ifdef __cplusplus
 extern "C" {

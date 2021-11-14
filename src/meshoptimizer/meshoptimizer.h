@@ -10,12 +10,13 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include "../export.h"
 
 /* Version macro; major * 1000 + minor * 10 + patch */
 #define MESHOPTIMIZER_VERSION 110
 
 /* If no API is defined, assume default */
-#define MESHOPTIMIZER_API __declspec(dllexport)
+#define MESHOPTIMIZER_API EXPORT
 #ifndef MESHOPTIMIZER_API
 #define MESHOPTIMIZER_API
 #endif
