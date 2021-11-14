@@ -3,11 +3,11 @@ name: build
 on: [push, pull_request]
 
 jobs:
-  fail-fast: false
   windows:
     name: Test on ${{ matrix.os }} with arch ${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         arch: [Win32, x64]
         os: [windows-2019]
@@ -29,6 +29,7 @@ jobs:
     name: Test on ${{ matrix.os }} with arch ${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         arch: [x86, x64]
         os: [ubuntu-latest]
