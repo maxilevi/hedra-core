@@ -25,9 +25,23 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: cmake .
       
-    - name: cmake build
+    - name: cmake build windows
+      if: matrix.os == 'windows-2019'
       run: cmake --build . -- -property:Configuration=Release
+
+    - name: cmake build ubuntu
+      if: matrix.os == 'ubuntu-latest'
+      run: cmake --build .
+
+
     - uses: actions/upload-artifact@v1
+      if: matrix.os == 'windows-2019'
       with:
         name: hedra-core-${{matrix.arch}}-${{ matrix.os }}
         path: Release/hedracore.dll
+
+    - uses: actions/upload-artifact@v1
+      if: matrix.os == 'ubuntu-latest'
+      with:
+        name: hedra-core-${{matrix.arch}}-${{ matrix.os }}
+        path: libhedracore.so
