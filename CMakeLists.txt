@@ -53,7 +53,7 @@ add_library(noise_obj OBJECT ${FASTNOISE_SOURCES})
 if(MSVC)
 	target_compile_options(noise_obj PRIVATE /GL- /MT)
 else()
-	target_compile_options(noise_obj PRIVATE -shared)
+	target_compile_options(noise_obj PRIVATE -shared -std=c++11)
 endif()
 
 add_library(meshoptimizer_obj OBJECT ${MESHOPTIMIZER_SOURCES})
