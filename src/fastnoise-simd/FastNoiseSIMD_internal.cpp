@@ -108,6 +108,7 @@ typedef int SIMDi;
 #endif
 
 // Memory Allocation
+#include <cstring>
 #if SIMD_LEVEL > FN_NO_SIMD_FALLBACK && defined(FN_ALIGNED_SETS)
 #ifdef _WIN32
 #define SIMD_ALLOCATE_SET(floatP, floatCount) floatP = (float*)_aligned_malloc((floatCount)* sizeof(float), MEMORY_ALIGNMENT)
@@ -1072,7 +1073,6 @@ y = SIMDi_MASK_SUB(_yReset, y, ySizeV);}
 #ifdef FN_ALIGNED_SETS
 #define STORE_LAST_RESULT(_dest, _source) SIMDf_STORE(_dest, _source)
 #else
-#include <cstring>
 #define STORE_LAST_RESULT(_dest, _source) std::memcpy(_dest, &_source, (maxIndex - index) * 4)
 #endif
 
@@ -1162,48 +1162,46 @@ case GradientFractal_Normalise:\
 	}break;\
 }
 
+// Traverse rows independently when they hold at least one SIMD vector. This
+// avoids wrapping every lane's coordinates after every vector. Row starts can
+// be unaligned; memcpy permits unaligned stores and copies only valid tail lanes.
 #define SET_BUILDER_WITHOUT_PERTURB(f)\
-if ((zSize & (VECTOR_SIZE - 1)) == 0)\
+if (zSize >= VECTOR_SIZE)\
 {\
 	SIMDi yBase = SIMDi_SET(yStart);\
 	SIMDi zBase = SIMDi_ADD(SIMDi_NUM(incremental), SIMDi_SET(zStart));\
-	\
 	SIMDi x = SIMDi_SET(xStart);\
-	\
 	int index = 0;\
-	\
 	for (int ix = 0; ix < xSize; ix++)\
 	{\
 		SIMDf xf = SIMDf_MUL(SIMDf_CONVERT_TO_FLOAT(x), xFreqV);\
 		SIMDi y = yBase;\
-		\
 		for (int iy = 0; iy < ySize; iy++)\
 		{\
 			SIMDf yf = SIMDf_MUL(SIMDf_CONVERT_TO_FLOAT(y), yFreqV);\
 			SIMDi z = zBase;\
-			SIMDf xF = xf;\
-			SIMDf yF = yf;\
-			SIMDf zF = SIMDf_MUL(SIMDf_CONVERT_TO_FLOAT(z), zFreqV);\
-			\
-			SIMDf result;\
-			f;\
-			SIMDf_STORE(&noiseSet[index], result);\
-			\
-			int iz = VECTOR_SIZE;\
-			while (iz < zSize)\
+			int iz = 0;\
+			for (; iz <= zSize - VECTOR_SIZE; iz += VECTOR_SIZE)\
 			{\
-				z = SIMDi_ADD(z, SIMDi_NUM(vectorSize));\
-				index += VECTOR_SIZE;\
-				iz += VECTOR_SIZE;\
-				xF = xf;\
-				yF = yf;\
-				zF = SIMDf_MUL(SIMDf_CONVERT_TO_FLOAT(z), zFreqV);\
-				\
+				SIMDf xF = xf;\
+				SIMDf yF = yf;\
+				SIMDf zF = SIMDf_MUL(SIMDf_CONVERT_TO_FLOAT(z), zFreqV);\
 				SIMDf result;\
 				f;\
-				SIMDf_STORE(&noiseSet[index], result);\
+				std::memcpy(&noiseSet[index], &result, sizeof(result));\
+				index += VECTOR_SIZE;\
+				z = SIMDi_ADD(z, SIMDi_NUM(vectorSize));\
 			}\
-			index += VECTOR_SIZE;\
+			if (iz < zSize)\
+			{\
+				SIMDf xF = xf;\
+				SIMDf yF = yf;\
+				SIMDf zF = SIMDf_MUL(SIMDf_CONVERT_TO_FLOAT(z), zFreqV);\
+				SIMDf result;\
+				f;\
+				std::memcpy(&noiseSet[index], &result, (zSize - iz) * sizeof(float));\
+				index += zSize - iz;\
+			}\
 			y = SIMDi_ADD(y, SIMDi_NUM(1));\
 		}\
 		x = SIMDi_ADD(x, SIMDi_NUM(1));\
@@ -1352,6 +1350,18 @@ void SIMD_LEVEL_CLASS::Fill##func##Set(float* noiseSet, int xStart, int yStart, 
 	yF = SIMDf_ADD(yF, yOffsetV);\
 	zF = SIMDf_ADD(zF, zOffsetV);\
 
+// Most terrain sets do not use perturbation. Dispatch once per set so the
+// inner loop can inline the noise function without the perturbation switch.
+#define SET_BUILDER_WITH_OFFSET(f)\
+if (m_perturbType == None)\
+{\
+	SET_BUILDER_WITHOUT_PERTURB(ADD_OFFSET(); f;)\
+}\
+else\
+{\
+	SET_BUILDER_WITHOUT_PERTURB(ADD_OFFSET(); PERTURB_SWITCH(); f;)\
+}
+
 #define FILL_SET_WITH_OFFSET(func) \
 void SIMD_LEVEL_CLASS::Fill##func##SetWithOffset(float* noiseSet, float xOffset, float yOffset, float zOffset, int xSize, int ySize, int zSize)\
 {\
@@ -1362,9 +1372,7 @@ void SIMD_LEVEL_CLASS::Fill##func##SetWithOffset(float* noiseSet, float xOffset,
 	INIT_PERTURB_VALUES();\
 	INIT_OFFSET_VARIABLES();\
 	\
-	SET_BUILDER_WITHOUT_PERTURB(\
-		ADD_OFFSET();\
-		PERTURB_SWITCH();\
+	SET_BUILDER_WITH_OFFSET(\
 		result = FUNC(func##Single)(seedV, xF, yF, zF)\
 	)\
 	\
@@ -1388,23 +1396,17 @@ void SIMD_LEVEL_CLASS::Fill##func##FractalSetWithOffset(float* noiseSet, float x
 	switch(m_fractalType)\
 	{\
 	case FBM:\
-		SET_BUILDER_WITHOUT_PERTURB(\
-			ADD_OFFSET();\
-			PERTURB_SWITCH();\
+		SET_BUILDER_WITH_OFFSET(\
 			FBM_SINGLE(func)\
 		)\
 		break;\
 	case Billow:\
-		SET_BUILDER_WITHOUT_PERTURB(\
-			ADD_OFFSET();\
-			PERTURB_SWITCH();\
+		SET_BUILDER_WITH_OFFSET(\
 			BILLOW_SINGLE(func)\
 		)\
 		break;\
 	case RigidMulti:\
-		SET_BUILDER_WITHOUT_PERTURB(\
-			ADD_OFFSET();\
-			PERTURB_SWITCH();\
+		SET_BUILDER_WITH_OFFSET(\
 			RIGIDMULTI_SINGLE(func)\
 		)\
 		break;\

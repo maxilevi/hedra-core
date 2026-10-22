@@ -153,7 +153,10 @@ static void buildPositionRemap(unsigned int* remap, unsigned int* wedge, const f
 {
 	PositionHasher hasher = {vertex_positions_data, vertex_positions_stride / sizeof(float)};
 
-	size_t table_size = hashBuckets2(vertex_count);
+	// Keep a spare quarter of the capacity before rounding up. A vertex
+	// count near a power of two otherwise fills this open-addressed table
+	// almost completely, making unsuccessful probes disproportionately costly.
+	size_t table_size = hashBuckets2(vertex_count + vertex_count / 4 + 1);
 	unsigned int* table = allocator.allocate<unsigned int>(table_size);
 	memset(table, -1, table_size * sizeof(unsigned int));
 
@@ -266,7 +269,7 @@ static size_t countOpenEdges(const EdgeAdjacency& adjacency, unsigned int vertex
 	return result;
 }
 
-static void classifyVertices(unsigned char* result, unsigned int* loop, size_t vertex_count, const EdgeAdjacency& adjacency, const unsigned int* remap, const unsigned int* wedge, const unsigned int* blacklist_index_data, size_t blacklist_index_count)
+static void classifyVertices(unsigned char* result, unsigned int* loop, size_t vertex_count, const EdgeAdjacency& adjacency, const unsigned int* remap, const unsigned int* wedge, const unsigned char* vertex_locked)
 {
 	for (size_t i = 0; i < vertex_count; ++i)
 		loop[i] = ~0u;
@@ -280,19 +283,11 @@ static void classifyVertices(unsigned char* result, unsigned int* loop, size_t v
 
 	for (size_t i = 0; i < vertex_count; ++i)
 	{
-	    bool isBlacklisted = false;
-	    for(size_t k = 0; k < blacklist_index_count; ++k)
-	    {
-            if (blacklist_index_data[k] == i)
-            {
-                isBlacklisted = true;
-            }
-        }
-        if(isBlacklisted)
-        {
-            result[i] = Kind_Locked;
-            continue;
-	    }
+		if (vertex_locked && vertex_locked[i])
+		{
+			result[i] = Kind_Locked;
+			continue;
+		}
 
 		if (remap[i] == i)
 		{
@@ -419,6 +414,26 @@ static void rescalePositions(Vector3* result, const float* vertex_positions_data
 		result[i].y = (result[i].y - minv[1]) * scale;
 		result[i].z = (result[i].z - minv[2]) * scale;
 	}
+}
+
+// Without border/seam penalties, an axis-aligned plane has exactly zero
+// face-quadric error at every vertex. Preserve the normal collapse order while
+// avoiding construction, merging and ranking of these all-zero errors.
+static bool hasZeroPlanarError(const Vector3* positions, const unsigned char* kinds, size_t vertex_count)
+{
+	unsigned int axes = 7;
+	for (size_t i = 0; i < vertex_count; ++i)
+	{
+		if (kinds[i] != Kind_Manifold && kinds[i] != Kind_Locked)
+			return false;
+		const Vector3& p = positions[i];
+		if (!(fabsf(p.x) <= FLT_MAX && fabsf(p.y) <= FLT_MAX && fabsf(p.z) <= FLT_MAX))
+			return false;
+		axes &= (p.x == 0.f ? 1 : 0) | (p.y == 0.f ? 2 : 0) | (p.z == 0.f ? 4 : 0);
+		if (!axes)
+			return false;
+	}
+	return vertex_count != 0;
 }
 
 struct Quadric
@@ -817,7 +832,8 @@ static size_t performEdgeCollapses(unsigned int* collapse_remap, unsigned char* 
 		assert(collapse_remap[r0] == r0);
 		assert(collapse_remap[r1] == r1);
 
-		quadricAdd(vertex_quadrics[r1], vertex_quadrics[r0]);
+		if (vertex_quadrics)
+			quadricAdd(vertex_quadrics[r1], vertex_quadrics[r0]);
 
 		if (vertex_kind[i0] == Kind_Complex)
 		{
@@ -1138,7 +1154,17 @@ size_t meshopt_simplify(unsigned int* destination, const unsigned int* indices, 
 	// classify vertices; vertex kind determines collapse rules, see kCanCollapse
 	unsigned char* vertex_kind = allocator.allocate<unsigned char>(vertex_count);
 	unsigned int* loop = allocator.allocate<unsigned int>(vertex_count);
-	classifyVertices(vertex_kind, loop, vertex_count, adjacency, remap, wedge, blacklist_index_data, blacklist_index_count);
+	// Border lists contain repeated indices. Mark membership once instead of
+	// scanning the entire list for each vertex (O(V+B), previously O(V*B)).
+	unsigned char* vertex_locked = blacklist_index_count ? allocator.allocate<unsigned char>(vertex_count) : 0;
+	if (vertex_locked)
+	{
+		memset(vertex_locked, 0, vertex_count);
+		for (size_t i = 0; i < blacklist_index_count; ++i)
+			if (blacklist_index_data[i] < vertex_count)
+				vertex_locked[blacklist_index_data[i]] = 1;
+	}
+	classifyVertices(vertex_kind, loop, vertex_count, adjacency, remap, wedge, vertex_locked);
 
 #if TRACE
 	size_t unique_positions = 0;
@@ -1158,11 +1184,14 @@ size_t meshopt_simplify(unsigned int* destination, const unsigned int* indices, 
 	Vector3* vertex_positions = allocator.allocate<Vector3>(vertex_count);
 	rescalePositions(vertex_positions, vertex_positions_data, vertex_count, vertex_positions_stride);
 
-	Quadric* vertex_quadrics = allocator.allocate<Quadric>(vertex_count);
-	memset(vertex_quadrics, 0, vertex_count * sizeof(Quadric));
-
-	fillFaceQuadrics(vertex_quadrics, indices, index_count, vertex_positions, remap);
-	fillEdgeQuadrics(vertex_quadrics, indices, index_count, vertex_positions, remap, vertex_kind, loop);
+	bool zero_planar_error = hasZeroPlanarError(vertex_positions, vertex_kind, vertex_count);
+	Quadric* vertex_quadrics = zero_planar_error ? 0 : allocator.allocate<Quadric>(vertex_count);
+	if (vertex_quadrics)
+	{
+		memset(vertex_quadrics, 0, vertex_count * sizeof(Quadric));
+		fillFaceQuadrics(vertex_quadrics, indices, index_count, vertex_positions, remap);
+		fillEdgeQuadrics(vertex_quadrics, indices, index_count, vertex_positions, remap, vertex_kind, loop);
+	}
 
 	if (result != indices)
 		memcpy(result, indices, index_count * sizeof(unsigned int));
@@ -1190,13 +1219,23 @@ size_t meshopt_simplify(unsigned int* destination, const unsigned int* indices, 
 		if (edge_collapse_count == 0)
 			break;
 
-		rankEdgeCollapses(edge_collapses, edge_collapse_count, vertex_positions, vertex_quadrics, remap);
+		if (zero_planar_error)
+		{
+			for (size_t i = 0; i < edge_collapse_count; ++i)
+			{
+				edge_collapses[i].error = 0.f;
+				collapse_order[i] = unsigned(i);
+			}
+		}
+		else
+			rankEdgeCollapses(edge_collapses, edge_collapse_count, vertex_positions, vertex_quadrics, remap);
 
 #if TRACE > 1
 		dumpEdgeCollapses(edge_collapses, edge_collapse_count, vertex_kind);
 #endif
 
-		sortEdgeCollapses(collapse_order, edge_collapses, edge_collapse_count);
+		if (!zero_planar_error)
+			sortEdgeCollapses(collapse_order, edge_collapses, edge_collapse_count);
 
 		// most collapses remove 2 triangles; use this to establish a bound on the pass in terms of error limit
 		// note that edge_collapse_goal is an estimate; triangle_collapse_goal will be used to actually limit collapses
